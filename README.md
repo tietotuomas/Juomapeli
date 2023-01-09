@@ -1,1 +1,2 @@
 # Juomapeli
+Aaltonen & Rautava Software
