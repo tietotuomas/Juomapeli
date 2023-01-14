@@ -1,5 +1,14 @@
 import { useState } from 'react'
-import { Typography, Button, Stack, TextField, Container } from '@mui/material'
+import {
+  Typography,
+  Button,
+  Stack,
+  TextField,
+  Container,
+  List,
+  ListItem,
+  ListItemText,
+} from '@mui/material'
 import SendIcon from '@mui/icons-material/Send'
 
 const App = () => {
@@ -118,7 +127,7 @@ const App = () => {
     if (round > 0) {
       return (
         <div>
-          <Button type="submit" onClick={quitGame}>
+          <Button type="submit" variant="outlined" onClick={quitGame}>
             Lopeta peli
           </Button>
         </div>
@@ -130,7 +139,7 @@ const App = () => {
           <Typography variant="h4">Aloita peli:</Typography>
 
           <br />
-          <Stack spacing={1} direction="row">
+          <Stack spacing={1} direction="row" display="block">
             <Button
               variant="contained"
               type="submit"
@@ -170,7 +179,9 @@ const App = () => {
           {shuffleCard()}
           <br />
           <br />
-          <button onClick={nextRound}>Seuraava kierros</button>
+          <Button variant="contained" size="large" onClick={nextRound}>
+            Seuraava kierros
+          </Button>
         </div>
       )
     }
@@ -215,12 +226,17 @@ const App = () => {
   const addRule = () => {
     return (
       <form onSubmit={handleNewRule}>
-        <input
-          type="text"
-          value={rule}
-          onChange={(event) => setRule(event.target.value)}
-        ></input>
-        <button type="submit">Lisää sääntö</button>
+        <Stack spacing={1} direction="row">
+          <TextField
+            size="small"
+            type="text"
+            value={rule}
+            onChange={(event) => setRule(event.target.value)}
+          ></TextField>
+          <Button variant="contained" type="submit">
+            Lisää sääntö
+          </Button>
+        </Stack>
       </form>
     )
   }
@@ -232,29 +248,36 @@ const App = () => {
       </Typography>
 
       {addPlayer()}
-      <ul>
+
+      <List>
         {players.map((p) => (
-          <li key={p}>{p}</li>
+          <ListItem key={p}>
+            <ListItemText>{p}</ListItemText>
+          </ListItem>
         ))}
-      </ul>
+      </List>
 
       {drawButton()}
       {round > 0 ? (
         <div>
-          {`Vuorossa: ${players[drinker]}`}
+          <br/>
+          <Typography variant="subtitle1">{`Vuorossa: ${players[drinker]}`}</Typography>
           <br />
-          {`Kierros: ${round}/${maxRounds}`}
+          <Typography variant="subtitle1">{`Kierros: ${round}/${maxRounds}`}</Typography>
         </div>
       ) : null}
 
       {showRuleForm === false && drawCard()}
       {showRuleForm === true && addRule()}
+      <br />
       {rules.length > 0 ? <Typography variant="h3">Säännöt:</Typography> : null}
-      <ul>
+      <List>
         {rules.map((r) => (
-          <li key={r}>{r}</li>
+          <ListItem key={r}>
+            <ListItemText primary={r} />
+          </ListItem>
         ))}
-      </ul>
+      </List>
     </Container>
   )
 }
