@@ -1,6 +1,5 @@
 import titleImg from './assets/titleImg.png'
 import helenius from './assets/helenius.webp'
-import painostusbiisi from './assets/painostusbiisi.mp3'
 
 import { useState } from 'react'
 import {
@@ -31,6 +30,13 @@ const App = () => {
   const [rule, setRule] = useState('Puhukaa englantia')
   const [showRuleForm, setShowRuleForm] = useState(false)
   const [cards, setCards] = useState([])
+  const [painostusbiisiPlays, setPainostusbiisiPlays] = useState(false)
+
+ console.log("App renderöidään");
+  const painostusbiisi = new Audio("/painostusbiisi.mp3")
+  // const startPainostusbiisi = () => {
+  //   painostusbiisi.play()
+  // }
 
   const handleNewName = (event) => {
     event.preventDefault()
@@ -59,8 +65,11 @@ const App = () => {
   }
 
   const nextRound = () => {
+    console.log("NextRound funkkari");
     setRound(round + 1)
+    console.log("setRound");
     if (drinker + 1 < players.length) {
+      console.log("setDrinker");
       setDrinker(drinker + 1)
     } else {
       setDrinker(0)
@@ -99,6 +108,11 @@ const App = () => {
       }
       cardsToBeAdded.push(
         ...[
+          'Painostusbiisi',
+          'Painostusbiisi',
+          'Painostusbiisi',
+          'Painostusbiisi',
+          'Painostusbiisi',
           'Painostusbiisi',
           'Sääntö',
           'Vesiputous',
@@ -187,7 +201,12 @@ const App = () => {
   }
 
   const shuffleCard = () => {
+    console.log("shuffleCard funkkaria kutsuttiin");
+    if (painostusbiisiPlays) {
+      setPainostusbiisiPlays(false)
+    }
     const card = cards[Math.floor(Math.random() * cards.length)]
+    console.log("kortti nyt", card);
     if (card === 'Juo ') {
       const amount = Math.floor(Math.random() * factor) + 1
       return <Typography variant="h3">Juo {amount}</Typography>
@@ -210,6 +229,15 @@ const App = () => {
           <Typography variant="h3">{card}</Typography>
         </div>
       )
+    }
+
+    if (card === 'Painostusbiisi') {
+      console.log("Painostusbiisi kortti");
+
+      setPainostusbiisiPlays(true)
+
+      return <Typography variant="h3">{card}</Typography>
+
     }
     return <Typography variant="h3">{card}</Typography>
   }
@@ -268,7 +296,7 @@ const App = () => {
     <ThemeProvider theme={theme}>
       {/* <Container sx={{ backgroundColor: '#000000' }}> */}
       <Container>
-      <audio src={'./assets/painostusbiisi.mp3'} controls={true} autoPlay />
+        {painostusbiisiPlays ? painostusbiisi.play() : null}
         <Grid container justify="center" style={{ marginBottom: '20px' }}>
           <img src={titleImg} alt="Juomapeli" />
         </Grid>
