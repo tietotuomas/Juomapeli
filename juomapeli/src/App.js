@@ -1,5 +1,6 @@
 import titleImg from './assets/titleImg.png'
 import helenius from './assets/helenius.webp'
+import painostusbiisi from './assets/painostusbiisi.mp3'
 
 import { useState } from 'react'
 import {
@@ -267,6 +268,7 @@ const App = () => {
     <ThemeProvider theme={theme}>
       {/* <Container sx={{ backgroundColor: '#000000' }}> */}
       <Container>
+      <audio src={'./assets/painostusbiisi.mp3'} controls={true} autoPlay />
         <Grid container justify="center" style={{ marginBottom: '20px' }}>
           <img src={titleImg} alt="Juomapeli" />
         </Grid>
@@ -288,28 +290,22 @@ const App = () => {
         {round > 0 ? (
           <Grid container my={4}>
             <Grid item xs={2}>
-              <Box>
-                <Typography variant="subtitle1">{`Vuorossa: ${players[drinker]}`}</Typography>
-              </Box>
+              <Typography variant="subtitle1">{`Vuorossa: ${players[drinker]}`}</Typography>
             </Grid>
             <Grid item xs={2}>
-              <Box>
-                <Typography variant="subtitle1">{`Kierros: ${round}/${maxRounds}`}</Typography>
-              </Box>
+              <Typography variant="subtitle1">{`Kierros: ${round}/${maxRounds}`}</Typography>
             </Grid>
             <Grid item xs={6}>
-              <Box>
-                {rules.length > 0 ? (
-                  <Typography variant="h5">Säännöt:</Typography>
-                ) : null}
-                <List>
-                  {rules.map((r) => (
-                    <ListItem key={r}>
-                      <ListItemText primary={r} />
-                    </ListItem>
-                  ))}
-                </List>
-              </Box>
+              {rules.length > 0 ? (
+                <Typography variant="h5">Säännöt:</Typography>
+              ) : null}
+              <List>
+                {rules.map((r) => (
+                  <ListItem key={r}>
+                    <ListItemText primary={r} />
+                  </ListItem>
+                ))}
+              </List>
             </Grid>
           </Grid>
         ) : null}
