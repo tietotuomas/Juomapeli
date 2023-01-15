@@ -1,5 +1,10 @@
+import titleImg from './assets/titleImg.png'
+import helenius from './assets/helenius.webp'
+
 import { useState } from 'react'
 import {
+  Box,
+  Grid,
   Typography,
   Button,
   Stack,
@@ -8,8 +13,11 @@ import {
   List,
   ListItem,
   ListItemText,
+  createTheme,
+  ThemeProvider,
 } from '@mui/material'
 import SendIcon from '@mui/icons-material/Send'
+import { orange } from '@mui/material/colors'
 
 const App = () => {
   const [name, setName] = useState('')
@@ -123,17 +131,8 @@ const App = () => {
     // }
   }
 
-  const drawButton = () => {
-    if (round > 0) {
-      return (
-        <div>
-          <Button type="submit" variant="outlined" onClick={quitGame}>
-            Lopeta peli
-          </Button>
-        </div>
-      )
-    }
-    if (players.length > 1) {
+  const difficultyButton = () => {
+    if (round === 0 && players.length > 1) {
       return (
         <div>
           <Typography variant="h4">Aloita peli:</Typography>
@@ -175,9 +174,8 @@ const App = () => {
     if (round > 0) {
       return (
         <div>
-          <br />
           {shuffleCard()}
-          <br />
+
           <br />
           <Button variant="contained" size="large" onClick={nextRound}>
             Seuraava kierros
@@ -191,16 +189,28 @@ const App = () => {
     const card = cards[Math.floor(Math.random() * cards.length)]
     if (card === 'Juo ') {
       const amount = Math.floor(Math.random() * factor) + 1
-      return <span>Juo {amount}</span>
+      return <Typography variant="h3">Juo {amount}</Typography>
     }
     if (card === 'Tarjoa ') {
       const amount = Math.floor(Math.random() * factor) + 1
-      return <span>Tarjoa {amount}</span>
+      return <Typography variant="h3">Tarjoa {amount}</Typography>
     }
     if (card === 'Sääntö') {
       setShowRuleForm(true)
     }
-    return <span>{card}</span>
+    if (card === 'Juo shotti') {
+      return (
+        <div>
+          <img
+            src={helenius}
+            alt="Helenius"
+            style={{ objectFit: 'cover', width: '100%', height: '70%' }}
+          />
+          <Typography variant="h3">{card}</Typography>
+        </div>
+      )
+    }
+    return <Typography variant="h3">{card}</Typography>
   }
 
   const addPlayer = () => {
@@ -241,44 +251,86 @@ const App = () => {
     )
   }
 
+  const theme = createTheme({
+    palette: {
+      primary: {
+        main: orange[700],
+      },
+      secondary: {
+        main: '#212121',
+      },
+      // text: { primary: '#FFFFFF' },
+    },
+  })
+
   return (
-    <Container>
-      <Typography variant="h1" gutterBottom>
-        Juomapeli
-      </Typography>
+    <ThemeProvider theme={theme}>
+      {/* <Container sx={{ backgroundColor: '#000000' }}> */}
+      <Container>
+        <Grid container justify="center" style={{ marginBottom: '20px' }}>
+          <img src={titleImg} alt="Juomapeli" />
+        </Grid>
+        {addPlayer()}
 
-      {addPlayer()}
+        {round === 0 ? (
+          <List>
+            {players.map((p) => (
+              <ListItem key={p}>
+                <ListItemText>
+                  <Typography variant="h3">{p}</Typography>
+                </ListItemText>
+              </ListItem>
+            ))}
+          </List>
+        ) : null}
 
-      <List>
-        {players.map((p) => (
-          <ListItem key={p}>
-            <ListItemText>{p}</ListItemText>
-          </ListItem>
-        ))}
-      </List>
+        {difficultyButton()}
+        {round > 0 ? (
+          <Grid container my={4}>
+            <Grid item xs={2}>
+              <Box>
+                <Typography variant="subtitle1">{`Vuorossa: ${players[drinker]}`}</Typography>
+              </Box>
+            </Grid>
+            <Grid item xs={2}>
+              <Box>
+                <Typography variant="subtitle1">{`Kierros: ${round}/${maxRounds}`}</Typography>
+              </Box>
+            </Grid>
+            <Grid item xs={6}>
+              <Box>
+                {rules.length > 0 ? (
+                  <Typography variant="h5">Säännöt:</Typography>
+                ) : null}
+                <List>
+                  {rules.map((r) => (
+                    <ListItem key={r}>
+                      <ListItemText primary={r} />
+                    </ListItem>
+                  ))}
+                </List>
+              </Box>
+            </Grid>
+          </Grid>
+        ) : null}
 
-      {drawButton()}
-      {round > 0 ? (
-        <div>
-          <br/>
-          <Typography variant="subtitle1">{`Vuorossa: ${players[drinker]}`}</Typography>
-          <br />
-          <Typography variant="subtitle1">{`Kierros: ${round}/${maxRounds}`}</Typography>
-        </div>
-      ) : null}
-
-      {showRuleForm === false && drawCard()}
-      {showRuleForm === true && addRule()}
-      <br />
-      {rules.length > 0 ? <Typography variant="h3">Säännöt:</Typography> : null}
-      <List>
-        {rules.map((r) => (
-          <ListItem key={r}>
-            <ListItemText primary={r} />
-          </ListItem>
-        ))}
-      </List>
-    </Container>
+        <Grid container my={10}>
+          <Grid item xs={3}>
+            {showRuleForm === false && drawCard()}
+            {showRuleForm === true && addRule()}
+          </Grid>
+          <Grid item xs={5}></Grid>
+          <Grid item xs={3}></Grid>
+        </Grid>
+        <Box style={{ marginTop: 30 }}>
+          {round > 0 ? (
+            <Button type="submit" variant="outlined" onClick={quitGame}>
+              Lopeta peli
+            </Button>
+          ) : null}
+        </Box>
+      </Container>
+    </ThemeProvider>
   )
 }
 
