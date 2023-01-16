@@ -8,12 +8,11 @@ const PlayingCard = ({
   handleNewRule,
   rule,
   setRule,
-  painostusbiisi
+  painostusbiisi,
 }) => {
+  const maistuu = new Audio('/maistuu.mp3')
   console.log('PlayingCard renderöidään:')
   console.log('kortti:', playingCard)
-
-
 
   if (playingCard === '') {
     return null
@@ -21,6 +20,11 @@ const PlayingCard = ({
 
   if (playingCard === 'Juo ') {
     const amount = Math.floor(Math.random() * factor) + 1
+    if (amount > 9 && Math.random() > 0.6) {
+      console.log('maistuu')
+      maistuu.play()
+    }
+
     return (
       <div>
         <Typography variant="h3">Juo {amount}</Typography>
@@ -69,7 +73,6 @@ const PlayingCard = ({
   }
 
   if (playingCard === 'Painostusbiisi') {
-
     painostusbiisi.play()
 
     return (

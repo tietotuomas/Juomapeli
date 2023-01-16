@@ -3,6 +3,7 @@ import AddPlayer from './components/AddPlayer'
 import Players from './components/Players'
 import DifficultyButton from './components/DifficultyButton'
 import PlayingCard from './components/PlayingCard'
+import Notification from './components/Notification'
 
 import { useState, useEffect } from 'react'
 import {
@@ -31,6 +32,8 @@ const App = () => {
   const [rule, setRule] = useState('Puhukaa englantia')
   const [cards, setCards] = useState([])
   const [playingCard, setPlayingCard] = useState('')
+  const [message, setMessage] = useState({ msg: '', severity: '' })
+  const [timeOutId, setTimeOutId] = useState(null)
 
   useEffect(() => {
     if (round === 1) {
@@ -56,6 +59,11 @@ const App = () => {
   }
 
   const quitGame = () => {
+    round > maxRounds ?     createMessage(
+      `Winner winner chicken dinner`, 'success', 10
+    ) :     createMessage(
+      `Luuserit!`, 'error', 5
+    )
     setRound(0)
     setPlayers([])
     setDrinker(0)
@@ -65,6 +73,23 @@ const App = () => {
     setRule('')
     setCards([])
     setPlayingCard('')
+    painostusbiisi.pause()
+    painostusbiisi.currentTime = 0
+  }
+
+  // severity='info' so severity would be info if left blank
+  // time=5 so duration would be 5 seconds if left blank
+  const createMessage = (msg, severity = 'info', time = 5) => {
+    setMessage({ msg: msg, severity: severity })
+    if (timeOutId) {
+      //clear timeOutId so the current notification won't disappear too early
+      clearTimeout(timeOutId)
+    }
+    const id = setTimeout(() => {
+      setMessage({ msg: '', severity: '' })
+    }, time * 1000)
+
+    setTimeOutId(id)
   }
 
   const nextRound = () => {
@@ -116,13 +141,14 @@ const App = () => {
           'Sääntö',
           'Vesiputous',
           'Sanaleikki',
+          'Kaikki juo 1',
           'Kaikki juo 2',
         ]
       )
       setCards(cardsToBeAdded)
     }
     if (level === 'tiistai') {
-      setFactor(15)
+      setFactor(12)
       setMaxRounds(52)
       for (let i = 0; i < 4; i++) {
         cardsToBeAdded.push('Juo ')
@@ -144,6 +170,11 @@ const App = () => {
     //   VALITSE ITSE KORTIT?
     // }
     console.log('startGamen lopussa')
+    createMessage(
+      `Pelaajat: ${players.slice(0, -1).join(', ')} ja ${players.slice(
+        -1
+      )}. GL HF!`
+    )
     setRound(1)
   }
 
@@ -176,6 +207,9 @@ const App = () => {
         <Grid container justify="center" style={{ marginBottom: '20px' }}>
           <img src={titleImg} alt="Juomapeli" />
         </Grid>
+        {message.msg ? (
+          <Notification message={message.msg} severity={message.severity} />
+        ) : null}
         <AddPlayer
           round={round}
           handleNewName={handleNewName}
