@@ -10,8 +10,6 @@ import {
   Grid,
   Typography,
   Button,
-  Stack,
-  TextField,
   Container,
   List,
   ListItem,
@@ -31,24 +29,18 @@ const App = () => {
   const [drinker, setDrinker] = useState(0)
   const [rules, setRules] = useState([])
   const [rule, setRule] = useState('Puhukaa englantia')
-  const [showRuleForm, setShowRuleForm] = useState(false)
   const [cards, setCards] = useState([])
   const [playingCard, setPlayingCard] = useState('')
-  const [painostusbiisiPlays, setPainostusbiisiPlays] = useState(false)
 
   useEffect(() => {
-    if (round > maxRounds) {
-      quitGame()
-    } else if (round > 0) {
-      drawCard()
+    if (round === 1) {
+      shuffleCard()
     }
   }, [round])
 
   console.log('App renderöidään')
+
   const painostusbiisi = new Audio('/painostusbiisi.mp3')
-  // const startPainostusbiisi = () => {
-  //   painostusbiisi.play()
-  // }
 
   const handleNewName = (event) => {
     event.preventDefault()
@@ -60,7 +52,6 @@ const App = () => {
     event.preventDefault()
     setRules(rules.concat(rule))
     setRule('')
-    setShowRuleForm(false)
     nextRound()
   }
 
@@ -73,21 +64,21 @@ const App = () => {
     setRules([])
     setRule('')
     setCards([])
-    setShowRuleForm(false)
     setPlayingCard('')
   }
 
   const nextRound = () => {
     console.log('NextRound funkkari')
     setRound(round + 1)
+    painostusbiisi.pause()
+    painostusbiisi.currentTime = 0
     console.log('setRound')
     if (drinker + 1 < players.length) {
-      console.log('setDrinker')
       setDrinker(drinker + 1)
     } else {
       setDrinker(0)
     }
-    drawCard()
+    shuffleCard()
   }
 
   const startGame = (level) => {
@@ -121,11 +112,6 @@ const App = () => {
       }
       cardsToBeAdded.push(
         ...[
-          'Painostusbiisi',
-          'Painostusbiisi',
-          'Painostusbiisi',
-          'Painostusbiisi',
-          'Painostusbiisi',
           'Painostusbiisi',
           'Sääntö',
           'Vesiputous',
@@ -161,42 +147,13 @@ const App = () => {
     setRound(1)
   }
 
-  const drawCard = () => {
-    console.log('drawCard', round)
-
-    if (showRuleForm) {
-      addRule()
-    } else if (round > 0) {
-      shuffleCard()
-    }
-  }
-
   const shuffleCard = () => {
-    console.log('shuffleCard funkkaria kutsuttiin')
-    if (painostusbiisiPlays) {
-      setPainostusbiisiPlays(false)
-    }
+    console.log('shuffleCard funkkaria kutsuttiin, round:', round)
     const card = cards[Math.floor(Math.random() * cards.length)]
     console.log('kortti nyt', card)
-    setPlayingCard(card)
-  }
+    console.log('----------')
 
-  const addRule = () => {
-    return (
-      <form onSubmit={handleNewRule}>
-        <Stack spacing={1} direction="row">
-          <TextField
-            size="small"
-            type="text"
-            value={rule}
-            onChange={(event) => setRule(event.target.value)}
-          ></TextField>
-          <Button variant="contained" type="submit">
-            Lisää sääntö
-          </Button>
-        </Stack>
-      </form>
-    )
+    setPlayingCard(card)
   }
 
   const theme = createTheme({
@@ -215,7 +172,7 @@ const App = () => {
     <ThemeProvider theme={theme}>
       {/* <Container sx={{ backgroundColor: '#000000' }}> */}
       <Container>
-        {/* {painostusbiisiPlays ? painostusbiisi.play() : null} */}
+        {round > maxRounds ? quitGame() : null}
         <Grid container justify="center" style={{ marginBottom: '20px' }}>
           <img src={titleImg} alt="Juomapeli" />
         </Grid>
@@ -261,8 +218,11 @@ const App = () => {
             <PlayingCard
               playingCard={playingCard}
               factor={factor}
-              setShowRuleForm={setShowRuleForm}
+              handleNewRule={handleNewRule}
+              rule={rule}
+              setRule={setRule}
               nextRound={nextRound}
+              painostusbiisi={painostusbiisi}
             />
           </Grid>
           <Grid item xs={5}></Grid>

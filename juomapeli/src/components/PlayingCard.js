@@ -1,9 +1,19 @@
-import { Typography, Button } from '@mui/material'
+import { Typography, Button, Stack, TextField } from '@mui/material'
 import helenius from '../assets/helenius.webp'
 
-const PlayingCard = ({ playingCard, factor, setShowRuleForm, nextRound }) => {
-  console.log('PlayingCard renderöidään')
-  console.log(playingCard)
+const PlayingCard = ({
+  playingCard,
+  factor,
+  nextRound,
+  handleNewRule,
+  rule,
+  setRule,
+  painostusbiisi
+}) => {
+  console.log('PlayingCard renderöidään:')
+  console.log('kortti:', playingCard)
+
+
 
   if (playingCard === '') {
     return null
@@ -28,7 +38,21 @@ const PlayingCard = ({ playingCard, factor, setShowRuleForm, nextRound }) => {
     )
   }
   if (playingCard === 'Sääntö') {
-    setShowRuleForm(true)
+    return (
+      <form onSubmit={handleNewRule}>
+        <Stack spacing={1} direction="row">
+          <TextField
+            size="medium"
+            type="text"
+            value={rule}
+            onChange={(event) => setRule(event.target.value)}
+          ></TextField>
+          <Button variant="contained" type="submit">
+            Lisää sääntö
+          </Button>
+        </Stack>
+      </form>
+    )
   }
   if (playingCard === 'Juo shotti') {
     return (
@@ -45,9 +69,8 @@ const PlayingCard = ({ playingCard, factor, setShowRuleForm, nextRound }) => {
   }
 
   if (playingCard === 'Painostusbiisi') {
-    console.log('Painostusbiisi kortti')
 
-    // setPainostusbiisiPlays(true)
+    painostusbiisi.play()
 
     return (
       <div>
