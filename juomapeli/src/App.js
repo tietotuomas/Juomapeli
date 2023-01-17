@@ -52,8 +52,12 @@ const App = () => {
 
   const handleNewName = (event) => {
     event.preventDefault()
-    setPlayers(players.concat(name))
-    setName('')
+    if (name) {
+      setPlayers(players.concat(name))
+      setName('')
+    } else {
+      createMessage('Nimi ei voi olla tyhjä', 'error', 3)
+    }
   }
 
   const handleNewRule = (event) => {
@@ -100,7 +104,6 @@ const App = () => {
   const nextRound = () => {
     console.log('NextRound funkkari')
     setRound(round + 1)
-    console.log('setRound')
     if (drinker + 1 < players.length) {
       setDrinker(drinker + 1)
     } else {
