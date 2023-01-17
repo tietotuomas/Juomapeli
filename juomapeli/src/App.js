@@ -34,6 +34,13 @@ const App = () => {
   const [playingCard, setPlayingCard] = useState('')
   const [message, setMessage] = useState({ msg: '', severity: '' })
   const [timeOutId, setTimeOutId] = useState(null)
+  const painostusbiisi = new Audio('/painostusbiisi.mp3')
+  const maistuu = new Audio('/maistuu.mp3')
+  const kommunismilla = new Audio('/kommunismilla.mp3')
+  const velaton = new Audio('/velaton.mp3')
+  const sakkoa = new Audio('./sakkoa.mp3')
+
+  const audios = [painostusbiisi, maistuu, kommunismilla, velaton, sakkoa]
 
   useEffect(() => {
     if (round === 1) {
@@ -42,8 +49,6 @@ const App = () => {
   }, [round])
 
   console.log('App renderöidään')
-
-  const painostusbiisi = new Audio('/painostusbiisi.mp3')
 
   const handleNewName = (event) => {
     event.preventDefault()
@@ -59,11 +64,9 @@ const App = () => {
   }
 
   const quitGame = () => {
-    round > maxRounds ?     createMessage(
-      `Winner winner chicken dinner`, 'success', 10
-    ) :     createMessage(
-      `Luuserit!`, 'error', 5
-    )
+    round > maxRounds
+      ? createMessage(`Winner winner chicken dinner`, 'success', 10)
+      : createMessage(`Luuserit!`, 'error', 5)
     setRound(0)
     setPlayers([])
     setDrinker(0)
@@ -73,8 +76,10 @@ const App = () => {
     setRule('')
     setCards([])
     setPlayingCard('')
-    painostusbiisi.pause()
-    painostusbiisi.currentTime = 0
+    audios.forEach((a) => {
+      a.pause()
+      a.currentTime = 0
+    })
   }
 
   // severity='info' so severity would be info if left blank
@@ -95,14 +100,16 @@ const App = () => {
   const nextRound = () => {
     console.log('NextRound funkkari')
     setRound(round + 1)
-    painostusbiisi.pause()
-    painostusbiisi.currentTime = 0
     console.log('setRound')
     if (drinker + 1 < players.length) {
       setDrinker(drinker + 1)
     } else {
       setDrinker(0)
     }
+    audios.forEach((a) => {
+      a.pause()
+      a.currentTime = 0
+    })
     shuffleCard()
   }
 
@@ -119,7 +126,6 @@ const App = () => {
         ...[
           'Painostusbiisi',
           'Sääntö',
-          'Sääntö',
           'Sanaleikki',
           'Sanaleikki',
           'Kaikki juo 1',
@@ -130,7 +136,7 @@ const App = () => {
     }
     if (level === 'seitin') {
       setFactor(10)
-      setMaxRounds(40)
+      setMaxRounds(30)
       for (let i = 0; i < 5; i++) {
         cardsToBeAdded.push('Juo ')
         cardsToBeAdded.push('Tarjoa ')
@@ -143,6 +149,7 @@ const App = () => {
           'Sanaleikki',
           'Kaikki juo 1',
           'Kaikki juo 2',
+          'Nouskaa ylös ja huutakaa "mestari", viimeinen juo 3',
         ]
       )
       setCards(cardsToBeAdded)
@@ -150,7 +157,7 @@ const App = () => {
     if (level === 'tiistai') {
       setFactor(12)
       setMaxRounds(52)
-      for (let i = 0; i < 4; i++) {
+      for (let i = 0; i < 5; i++) {
         cardsToBeAdded.push('Juo ')
         cardsToBeAdded.push('Tarjoa ')
       }
@@ -161,7 +168,9 @@ const App = () => {
           'Vesiputous',
           'Sanaleikki',
           'Kaikki juo 2',
+          'Kaikki juo 1',
           'Juo shotti',
+          'Nouskaa ylös ja huutakaa "mestari", viimeinen juo 3',
         ]
       )
       setCards(cardsToBeAdded)
@@ -180,7 +189,23 @@ const App = () => {
 
   const shuffleCard = () => {
     console.log('shuffleCard funkkaria kutsuttiin, round:', round)
-    const card = cards[Math.floor(Math.random() * cards.length)]
+    let card = cards[Math.floor(Math.random() * cards.length)]
+
+    //ad hoc fix to a extra render caused by notification at the start of the game
+    while (round < 3 && card === 'Painostusbiisi') {
+      console.log(card, 'uusi arvonta')
+      card = cards[Math.floor(Math.random() * cards.length)]
+    }
+
+    //no rules at the end of the game and maximum of 4 rules
+    while (
+      (round + 3 > maxRounds && card === 'Sääntö') ||
+      (rules.length > 3 && card === 'Sääntö')
+    ) {
+      console.log(card, 'uusi arvonta')
+      card = cards[Math.floor(Math.random() * cards.length)]
+    }
+
     console.log('kortti nyt', card)
     console.log('----------')
 
@@ -227,18 +252,22 @@ const App = () => {
         {round > 0 ? (
           <Grid container my={4}>
             <Grid item xs={2}>
-              <Typography variant="subtitle1">{`Vuorossa: ${players[drinker]}`}</Typography>
+              <Typography variant="subtitle1">
+                <b>{`Vuorossa: ${players[drinker]}`}</b>
+              </Typography>
             </Grid>
             <Grid item xs={2}>
-              <Typography variant="subtitle1">{`Kierros: ${round}/${maxRounds}`}</Typography>
+              <Typography variant="subtitle1">
+                <b>{`Kierros: ${round}/${maxRounds}`}</b>
+              </Typography>
             </Grid>
             <Grid item xs={6}>
               {rules.length > 0 ? (
-                <Typography variant="h5">Säännöt:</Typography>
+                <Typography variant="h5">Säännöt (rikkoja juo 1):</Typography>
               ) : null}
-              <List>
+              <List style={{ padding: 0, margin: 0 }}>
                 {rules.map((r) => (
-                  <ListItem key={r}>
+                  <ListItem style={{ padding: 0, margin: 0 }} key={r}>
                     <ListItemText primary={r} />
                   </ListItem>
                 ))}
@@ -257,6 +286,10 @@ const App = () => {
               setRule={setRule}
               nextRound={nextRound}
               painostusbiisi={painostusbiisi}
+              maistuu={maistuu}
+              kommunismilla={kommunismilla}
+              velaton={velaton}
+              sakkoa={sakkoa}
             />
           </Grid>
           <Grid item xs={5}></Grid>
